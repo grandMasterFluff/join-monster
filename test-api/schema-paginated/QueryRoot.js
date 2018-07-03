@@ -16,6 +16,7 @@ import knex from './database'
 import { User, UserConnection } from './User'
 import Sponsor from './Sponsor'
 import { nodeField } from './Node'
+import ContextPost from './ContextPost'
 
 import joinMonster from '../../src/index'
 import dbCall from '../data/fetch'
@@ -132,7 +133,17 @@ export default new GraphQLObjectType({
           .catch(done)
         }, options)
       }
+    },
+    contextPosts: {
+      type: new GraphQLList(ContextPost),
+        resolve: (parent, args, context, resolveInfo) => {
+          // use the callback version this time
+          return joinMonster(resolveInfo, context, (sql, done) => {
+            knex.raw(sql)
+              .then(data => done(null, data))
+              .catch(done)
+          }, options)
+        }
     }
   })
 })
-
